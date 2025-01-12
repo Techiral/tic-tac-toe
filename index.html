@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tic-Tac-Toe Game</title>
+  <style>
+    /* Styling */
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f0f8ff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      flex-direction: column;
+      text-align: center;
+      color: #4b4b4b;
+    }
+
+    h1 {
+      font-size: 3.5em;
+      color: #ff6347;
+      margin-bottom: 20px;
+      text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    #difficultySelection button {
+      background-color: #00bfff;
+      border: none;
+      color: white;
+      padding: 15px 32px;
+      font-size: 1.5em;
+      margin: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.2s;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    #difficultySelection button:hover {
+      background-color: #00b2ff;
+      transform: scale(1.1);
+    }
+
+    /* Game Board */
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 120px);
+      grid-template-rows: repeat(3, 120px);
+      gap: 10px;
+      margin-top: 40px;
+      justify-content: center;
+    }
+
+    .cell {
+      width: 120px;
+      height: 120px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 3.5em;
+      background-color: #ffffff;
+      border: 4px solid #ff6347;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+      transition: background-color 0.3s, transform 0.3s;
+    }
+
+    .cell:hover {
+      background-color: #ffebd1;
+      transform: scale(1.1);
+    }
+
+    .cell[style*="pointer-events: none"] {
+      background-color: #f0f0f0;
+      border: 4px solid #dcdcdc;
+    }
+
+    #result {
+      font-size: 2em;
+      font-weight: bold;
+      margin-top: 20px;
+      color: #ff6347;
+    }
+
+    /* Restart & Back Button */
+    button {
+      background-color: #ff6347;
+      border: none;
+      color: white;
+      padding: 15px 40px;
+      font-size: 1.5em;
+      margin-top: 20px;
+      cursor: pointer;
+      border-radius: 10px;
+      transition: background-color 0.3s, transform 0.3s;
+    }
+
+    button:hover {
+      background-color: #d43833;
+      transform: scale(1.05);
+    }
+
+    #gameBoard {
+      display: none;
+    }
+
+    #difficultySelection {
+      margin-top: 40px;
+      display: flex;
+      justify-content: center;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Tic-Tac-Toe Game</h1>
+
+  <div id="difficultySelection">
+    <button onclick="startGame('easy')">Easy</button>
+    <button onclick="startGame('medium')">Medium</button>
+    <button onclick="startGame('hard')">Hard</button>
+  </div>
+
+  <div id="gameBoard" class="board">
+    <div class="cell" onclick="makeMove(0)"></div>
+    <div class="cell" onclick="makeMove(1)"></div>
+    <div class="cell" onclick="makeMove(2)"></div>
+    <div class="cell" onclick="makeMove(3)"></div>
+    <div class="cell" onclick="makeMove(4)"></div>
+    <div class="cell" onclick="makeMove(5)"></div>
+    <div class="cell" onclick="makeMove(6)"></div>
+    <div class="cell" onclick="makeMove(7)"></div>
+    <div class="cell" onclick="makeMove(8)"></div>
+  </div>
+
+  <div id="result"></div>
+  <button id="restartButton" style="display:none;" onclick="restartGame()">Restart Game</button>
+  <button id="backButton" style="display:none;" onclick="goBackToModeSelection()">Back to Mode Selection</button>
+
+  <!-- Adding Sound Effects -->
+  <audio id="clickSound" src="mixkit-game-ball-tap-2073.mp3"></audio>
+  <audio id="winSound" src="mixkit-game-level-completed-2059.wav"></audio>
+  <audio id="tieSound" src="mixkit-player-losing-or-failing-2042.wav"></audio>
+  <audio id="restartSound" src="mixkit-bonus-earned-in-video-game-2058.wav"></audio>
+
+  <script>
+    let board = Array(9).fill(null);
+    let currentPlayer = 'X';
+    let gameOver = false;
+    let difficulty = '';
+
+    function playSound(soundId) {
+      const sound = document.getElementById(soundId);
+      sound.currentTime = 0; // Reset sound
+      sound.play();
+    }
+
+    function startGame(mode) {
+      playSound('restartSound');
+      difficulty = mode;
+      board = Array(9).fill(null);
+      currentPlayer = 'X';
+      gameOver = false;
+      document.getElementById("gameBoard").style.display = "grid";
+      document.getElementById("difficultySelection").style.display = "none";
+      document.getElementById("restartButton").style.display = "none";
+      document.getElementById("backButton").style.display = "none";
+      document.getElementById("result").textContent = '';
+      renderBoard();
+    }
+
+    function renderBoard() {
+      const cells = document.querySelectorAll('.cell');
+      cells.forEach((cell, index) => {
+        cell.textContent = board[index];
+        cell.style.pointerEvents = board[index] || gameOver ? 'none' : 'auto';
+      });
+    }
+
+    function makeMove(index) {
+      if (gameOver || board[index]) return;
+      playSound('clickSound');
+      board[index] = currentPlayer;
+      renderBoard();
+      if (checkWinner()) {
+        document.getElementById('result').textContent = `${currentPlayer} Wins!`;
+        playSound('winSound');
+        gameOver = true;
+        document.getElementById("restartButton").style.display = "inline-block";
+        document.getElementById("backButton").style.display = "inline-block";
+        return;
+      }
+      if (isBoardFull()) {
+        document.getElementById('result').textContent = "It's a Tie!";
+        playSound('tieSound');
+        gameOver = true;
+        document.getElementById("restartButton").style.display = "inline-block";
+        document.getElementById("backButton").style.display = "inline-block";
+        return;
+      }
+      currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+      if (currentPlayer === 'O' && !gameOver) {
+        aiMove();
+      }
+    }
+
+    function checkWinner() {
+      const winningCombination = [
+        [0, 1, 2],
+        [3, 4, 5],
+        [6, 7, 8],
+        [0, 3, 6],
+        [1, 4, 7],
+        [2, 5, 8],
+        [0, 4, 8],
+        [2, 4, 6]
+      ];
+      return winningCombination.some(combination =>
+        combination.every(index => board[index] === currentPlayer)
+      );
+    }
+
+    function isBoardFull() {
+      return board.every(cell => cell);
+    }
+
+    function aiMove() {
+      // Basic AI logic for demonstration
+      const availableMoves = board.map((cell, index) => cell === null ? index : null).filter(index => index !== null);
+      const randomMove = availableMoves[Math.floor(Math.random() * availableMoves.length)];
+      makeMove(randomMove);
+    }
+
+    function restartGame() {
+      playSound('restartSound');
+      startGame(difficulty);
+    }
+
+    function goBackToModeSelection() {
+      document.getElementById("gameBoard").style.display = "none";
+      document.getElementById("difficultySelection").style.display = "flex";
+      document.getElementById("result").textContent = '';
+    }
+  </script>
+</body>
+
+</html>
