@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -18,7 +18,6 @@
       flex-direction: column;
       text-align: center;
       color: #4b4b4b;
-      position: relative;
     }
 
     h1 {
@@ -115,23 +114,6 @@
       display: flex;
       justify-content: center;
     }
-
-    /* Ad Banner Styling */
-    .ad-banner {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 468px;
-      height: 60px;
-    }
-
-    .ad-left {
-      left: 10px;
-    }
-
-    .ad-right {
-      right: 10px;
-    }
   </style>
 </head>
 
@@ -159,34 +141,6 @@
   <div id="result"></div>
   <button id="restartButton" style="display:none;" onclick="restartGame()">Restart Game</button>
   <button id="backButton" style="display:none;" onclick="goBackToModeSelection()">Back to Mode Selection</button>
-
-  <!-- Left Ad Banner -->
-  <div class="ad-banner ad-left">
-    <script type="text/javascript">
-      atOptions = {
-        'key': '41359d79210653072c11fc1c74e76252',
-        'format': 'iframe',
-        'height': 60,
-        'width': 468,
-        'params': {}
-      };
-    </script>
-    <script type="text/javascript" src="//www.highperformanceformat.com/41359d79210653072c11fc1c74e76252/invoke.js"></script>
-  </div>
-
-  <!-- Right Ad Banner -->
-  <div class="ad-banner ad-right">
-    <script type="text/javascript">
-      atOptions = {
-        'key': '41359d79210653072c11fc1c74e76252',
-        'format': 'iframe',
-        'height': 60,
-        'width': 468,
-        'params': {}
-      };
-    </script>
-    <script type="text/javascript" src="//www.highperformanceformat.com/41359d79210653072c11fc1c74e76252/invoke.js"></script>
-  </div>
 
   <!-- Adding Sound Effects -->
   <audio id="clickSound" src="mixkit-game-ball-tap-2073.mp3"></audio>
@@ -232,20 +186,78 @@
       if (gameOver || board[index]) return;
       playSound('clickSound');
       board[index] = currentPlayer;
-      currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
       renderBoard();
+      if (checkWinner()) {
+        document.getElementById('result').textContent = `${currentPlayer} Wins!`;
+        playSound('winSound');
+        gameOver = true;
+        document.getElementById("restartButton").style.display = "inline-block";
+        document.getElementById("backButton").style.display = "inline-block";
+        return;
+      }
+      if (isBoardFull()) {
+        document.getElementById('result').textContent = "It's a Tie!";
+        playSound('tieSound');
+        gameOver = true;
+        document.getElementById("restartButton").style.display = "inline-block";
+        document.getElementById("backButton").style.display = "inline-block";
+        return;
+      }
+      currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+      if (currentPlayer === 'O' && !gameOver) {
+        aiMove();
+      }
+    }
+
+    function checkWinner() {
+      const winningCombination = [
+        [0, 1, 2],
+        [3, 4, 5],
+        [6, 7, 8],
+        [0, 3, 6],
+        [1, 4, 7],
+        [2, 5, 8],
+        [0, 4, 8],
+        [2, 4, 6]
+      ];
+      return winningCombination.some(combination =>
+        combination.every(index => board[index] === currentPlayer)
+      );
+    }
+
+    function isBoardFull() {
+      return board.every(cell => cell);
+    }
+
+    function aiMove() {
+      // Basic AI logic for demonstration
+      const availableMoves = board.map((cell, index) => cell === null ? index : null).filter(index => index !== null);
+      const randomMove = availableMoves[Math.floor(Math.random() * availableMoves.length)];
+      makeMove(randomMove);
     }
 
     function restartGame() {
+      playSound('restartSound');
       startGame(difficulty);
     }
 
     function goBackToModeSelection() {
       document.getElementById("gameBoard").style.display = "none";
       document.getElementById("difficultySelection").style.display = "flex";
-      document.getElementById("restartButton").style.display = "none";
-      document.getElementById("backButton").style.display = "none";
+      document.getElementById("result").textContent = '';
     }
   </script>
+  <script type='text/javascript' src='//pl25545836.profitablecpmrate.com/bc/6b/73/bc6b7301c214ebe375b7de586299e467.js'></script>
+  <script type="text/javascript">
+	atOptions = {
+		'key' : 'e65a7f2f20fbb9eb2f6bb958eaac3e45',
+		'format' : 'iframe',
+		'height' : 50,
+		'width' : 320,
+		'params' : {}
+	};
+</script>
+<script type="text/javascript" src="//www.highperformanceformat.com/e65a7f2f20fbb9eb2f6bb958eaac3e45/invoke.js"></script>
 </body>
+
 </html>
